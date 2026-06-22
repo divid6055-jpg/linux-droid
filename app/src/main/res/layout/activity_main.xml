@@ -23,95 +23,10 @@
         android:focusable="true"
         android:focusableInTouchMode="true" />
 
-    <LinearLayout
+    <com.linuxdroid.terminal.ExtraKeysBar
         android:id="@+id/extra_keys_bar"
         android:layout_width="match_parent"
         android:layout_height="44dp"
-        android:orientation="horizontal"
-        android:background="@color/bg_secondary"
-        android:padding="4dp"
-        android:visibility="gone">
-
-        <Button
-            android:id="@+id/key_ctrl"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="CTRL"
-            android:textSize="11sp"
-            android:minWidth="0dp"
-            android:padding="0dp" />
-
-        <Button
-            android:id="@+id/key_alt"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="ALT"
-            android:textSize="11sp"
-            android:minWidth="0dp"
-            android:padding="0dp" />
-
-        <Button
-            android:id="@+id/key_esc"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="ESC"
-            android:textSize="11sp"
-            android:minWidth="0dp"
-            android:padding="0dp" />
-
-        <Button
-            android:id="@+id/key_tab"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="TAB"
-            android:textSize="11sp"
-            android:minWidth="0dp"
-            android:padding="0dp" />
-
-        <Button
-            android:id="@+id/key_arrow_up"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="↑"
-            android:textSize="11sp"
-            android:minWidth="0dp"
-            android:padding="0dp" />
-
-        <Button
-            android:id="@+id/key_arrow_down"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="↓"
-            android:textSize="11sp"
-            android:minWidth="0dp"
-            android:padding="0dp" />
-
-        <Button
-            android:id="@+id/key_arrow_left"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="←"
-            android:textSize="11sp"
-            android:minWidth="0dp"
-            android:padding="0dp" />
-
-        <Button
-            android:id="@+id/key_arrow_right"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="→"
-            android:textSize="11sp"
-            android:minWidth="0dp"
-            android:padding="0dp" />
-
-    </LinearLayout>
+        android:background="@color/bg_secondary" />
 
 </LinearLayout>

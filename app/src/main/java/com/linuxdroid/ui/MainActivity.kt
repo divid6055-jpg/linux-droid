@@ -56,6 +56,40 @@ class MainActivity : AppCompatActivity() {
             else -> TerminalView.ColorScheme.DARK
         }
 
+        // ربط شريط المفاتيح الإضافي
+        val extraKeysBar = findViewById<com.linuxdroid.terminal.ExtraKeysBar>(R.id.extra_keys_bar)
+        extraKeysBar.keyListener = object : com.linuxdroid.terminal.ExtraKeysBar.OnKeyListener {
+            override fun onKey(key: com.linuxdroid.terminal.ExtraKeysBar.Key, isDown: Boolean) {
+                currentSession?.let { session ->
+                    val seq = when (key) {
+                        com.linuxdroid.terminal.ExtraKeysBar.Key.CTRL -> "\u0003"  // Ctrl+C context (handled by sticky)
+                        com.linuxdroid.terminal.ExtraKeysBar.Key.ALT -> ""
+                        com.linuxdroid.terminal.ExtraKeysBar.Key.SHIFT -> ""
+                        com.linuxdroid.terminal.ExtraKeysBar.Key.ESC -> "\u001B"
+                        com.linuxdroid.terminal.ExtraKeysBar.Key.TAB -> "\t"
+                        com.linuxdroid.terminal.ExtraKeysBar.Key.ARROW_UP -> "\u001B[A"
+                        com.linuxdroid.terminal.ExtraKeysBar.Key.ARROW_DOWN -> "\u001B[B"
+                        com.linuxdroid.terminal.ExtraKeysBar.Key.ARROW_RIGHT -> "\u001B[C"
+                        com.linuxdroid.terminal.ExtraKeysBar.Key.ARROW_LEFT -> "\u001B[D"
+                        com.linuxdroid.terminal.ExtraKeysBar.Key.HOME -> "\u001B[H"
+                        com.linuxdroid.terminal.ExtraKeysBar.Key.END -> "\u001B[F"
+                        com.linuxdroid.terminal.ExtraKeysBar.Key.PAGE_UP -> "\u001B[5~"
+                        com.linuxdroid.terminal.ExtraKeysBar.Key.PAGE_DOWN -> "\u001B[6~"
+                        com.linuxdroid.terminal.ExtraKeysBar.Key.MINUS -> "-"
+                        com.linuxdroid.terminal.ExtraKeysBar.Key.SLASH -> "/"
+                        com.linuxdroid.terminal.ExtraKeysBar.Key.PIPE -> "|"
+                        com.linuxdroid.terminal.ExtraKeysBar.Key.GREATER -> ">"
+                        com.linuxdroid.terminal.ExtraKeysBar.Key.LESS -> "<"
+                        com.linuxdroid.terminal.ExtraKeysBar.Key.DOLLAR -> "$"
+                        com.linuxdroid.terminal.ExtraKeysBar.Key.TILDE -> "~"
+                        com.linuxdroid.terminal.ExtraKeysBar.Key.ASTERISK -> "*"
+                        com.linuxdroid.terminal.ExtraKeysBar.Key.QUESTION -> "?"
+                    }
+                    if (seq.isNotEmpty()) session.write(seq)
+                }
+            }
+        }
+
         sessionManager = SessionManager.getInstance(this)
 
         // تهيئة جلسة
