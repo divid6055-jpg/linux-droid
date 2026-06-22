@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory android:title="@string/pref_appearance" app:iconSpaceReserved="false">
+
+        <SeekBarPreference
+            android:key="font_size"
+            android:title="@string/pref_font_size"
+            android:defaultValue="28"
+            app:showSeekBarValue="true"
+            app:min="12"
+            android:max="48"
+            app:iconSpaceReserved="false" />
+
+        <ListPreference
+            android:key="color_scheme"
+            android:title="@string/pref_color_scheme"
+            android:defaultValue="dark"
+            android:entries="@array/color_scheme_entries"
+            android:entryValues="@array/color_scheme_values"
+            app:iconSpaceReserved="false" />
+
+        <ListPreference
+            android:key="cursor_style"
+            android:title="@string/pref_cursor_style"
+            android:defaultValue="block"
+            android:entries="@array/cursor_style_entries"
+            android:entryValues="@array/cursor_style_values"
+            app:iconSpaceReserved="false" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/pref_behavior" app:iconSpaceReserved="false">
+
+        <SwitchPreferenceCompat
+            android:key="keep_screen_on"
+            android:title="@string/pref_keep_screen_on"
+            android:defaultValue="false"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            android:key="vibrate_on_key"
+            android:title="@string/pref_vibrate_on_key"
+            android:defaultValue="true"
+            app:iconSpaceReserved="false" />
+
+        <ListPreference
+            android:key="back_key_action"
+            android:title="@string/pref_back_key_action"
+            android:defaultValue="close"
+            android:entries="@array/back_action_entries"
+            android:entryValues="@array/back_action_values"
+            app:iconSpaceReserved="false" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/pref_advanced" app:iconSpaceReserved="false">
+
+        <EditTextPreference
+            android:key="home_dir"
+            android:title="@string/pref_home_dir"
+            android:defaultValue=""
+            app:iconSpaceReserved="false" />
+
+        <EditTextPreference
+            android:key="shell"
+            android:title="@string/pref_shell"
+            android:defaultValue="linuxdroid-sh"
+            app:iconSpaceReserved="false" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

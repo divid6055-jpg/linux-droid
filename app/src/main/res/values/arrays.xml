@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="color_scheme_entries">
+        <item>داكن (افتراضي)</item>
+        <item>فاتح</item>
+        <item>Solarized Dark</item>
+        <item>Dracula</item>
+    </string-array>
+    <string-array name="color_scheme_values">
+        <item>dark</item>
+        <item>light</item>
+        <item>solarized</item>
+        <item>dracula</item>
+    </string-array>
+
+    <string-array name="cursor_style_entries">
+        <item>كتلة (Block)</item>
+        <item>تحت الخط (Underline)</item>
+        <item>خط عمودي (Bar)</item>
+    </string-array>
+    <string-array name="cursor_style_values">
+        <item>block</item>
+        <item>underline</item>
+        <item>bar</item>
+    </string-array>
+
+    <string-array name="back_action_entries">
+        <item>إغلاق التطبيق</item>
+        <item>إغلاق لوحة المفاتيح</item>
+        <item>الرجوع لتطبيق سابق</item>
+    </string-array>
+    <string-array name="back_action_values">
+        <item>close</item>
+        <item>hide_keyboard</item>
+        <item>back</item>
+    </string-array>
+</resources>

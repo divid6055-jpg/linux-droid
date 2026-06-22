@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">LinuxDroid</string>
+    <string name="settings_title">الإعدادات</string>
+    <string name="help_title">المساعدة</string>
+
+    <!-- Menu -->
+    <string name="action_settings">الإعدادات</string>
+    <string name="action_help">المساعدة</string>
+    <string name="action_new_session">جلسة جديدة</string>
+    <string name="action_close_session">إغلاق الجلسة</string>
+    <string name="action_paste">لصق</string>
+    <string name="action_copy">نسخ</string>
+    <string name="action_select_all">تحديد الكل</string>
+
+    <!-- Terminal -->
+    <string name="terminal_ready">جاهز. اكتب \'help\' لعرض الأوامر المتاحة.</string>
+    <string name="terminal_welcome">LinuxDroid v%1$s — بيئة Linux خفيفة لأندرويد</string>
+    <string name="terminal_prompt">%1$s@linuxdroid:%2$s$ </string>
+    <string name="terminal_root_prompt">%1$s@linuxdroid:%2$s# </string>
+
+    <!-- Errors -->
+    <string name="error_command_not_found">خطأ: الأمر غير موجود: %1$s</string>
+    <string name="error_no_permission">خطأ: لا تملك صلاحية الوصول</string>
+    <string name="error_file_not_found">خطأ: الملف غير موجود: %1$s</string>
+    <string name="error_directory_not_found">خطأ: المجلد غير موجود: %1$s</string>
+    <string name="error_too_few_args">خطأ: معطيات غير كافية</string>
+    <string name="error_invalid_argument">خطأ: معطى غير صالح: %1$s</string>
+    <string name="error_internal">خطأ داخلي: %1$s</string>
+
+    <!-- Settings -->
+    <string name="pref_appearance">المظهر</string>
+    <string name="pref_font_size">حجم الخط</string>
+    <string name="pref_color_scheme">نظام الألوان</string>
+    <string name="pref_cursor_style">شكل المؤشر</string>
+    <string name="pref_behavior">السلوك</string>
+    <string name="pref_back_key_action">سلوك زر الرجوع</string>
+    <string name="pref_keep_screen_on">إبقاء الشاشة مضاءة</string>
+    <string name="pref_vibrate_on_key">اهتزاز عند الضغط</string>
+    <string name="pref_advanced">متقدم</string>
+    <string name="pref_home_dir">المجلد الرئيسي</string>
+    <string name="pref_shell">المفسّر الافتراضي</string>
+
+    <!-- Help -->
+    <string name="help_intro">LinuxDroid هو محاكي طرفية مع بيئة Linux كاملة لأندرويد.</string>
+    <string name="help_commands_title">الأوامر الأساسية</string>
+    <string name="help_help">اكتب \'help\' في الطرفية لعرض قائمة بجميع الأوامر المتاحة.</string>
+
+    <!-- Notifications -->
+    <string name="notif_session_title">LinuxDroid يعمل</string>
+    <string name="notif_session_text">جلسة طرفية نشطة</string>
+    <string name="notif_channel_name">جلسات الطرفية</string>
+    <string name="notif_channel_desc">إشعارات الجلسات النشطة في الخلفية</string>
+</resources>

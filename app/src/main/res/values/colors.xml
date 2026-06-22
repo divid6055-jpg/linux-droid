@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark theme palette (default) -->
+    <color name="bg_primary">#0C0C0C</color>
+    <color name="bg_secondary">#1A1A1A</color>
+    <color name="bg_tertiary">#262626</color>
+    <color name="text_primary">#E0E0E0</color>
+    <color name="text_secondary">#A0A0A0</color>
+    <color name="text_tertiary">#707070</color>
+    <color name="accent">#4FC3F7</color>
+    <color name="accent_dark">#0288D1</color>
+    <color name="error">#EF5350</color>
+    <color name="success">#66BB6A</color>
+    <color name="warning">#FFA726</color>
+
+    <!-- Terminal ANSI colors (16) -->
+    <color name="ansi_black">#000000</color>
+    <color name="ansi_red">#CC0000</color>
+    <color name="ansi_green">#4E9A06</color>
+    <color name="ansi_yellow">#C4A000</color>
+    <color name="ansi_blue">#3465A4</color>
+    <color name="ansi_magenta">#75507B</color>
+    <color name="ansi_cyan">#06989A</color>
+    <color name="ansi_white">#D3D7CF</color>
+    <color name="ansi_bright_black">#555753</color>
+    <color name="ansi_bright_red">#EF2929</color>
+    <color name="ansi_bright_green">#8AE234</color>
+    <color name="ansi_bright_yellow">#FCE94F</color>
+    <color name="ansi_bright_blue">#729FCF</color>
+    <color name="ansi_bright_magenta">#AD7FA8</color>
+    <color name="ansi_bright_cyan">#34E2E2</color>
+    <color name="ansi_bright_white">#EEEEEC</color>
+</resources>
