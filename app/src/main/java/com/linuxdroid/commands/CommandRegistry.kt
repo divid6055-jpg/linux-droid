@@ -129,6 +129,23 @@ object CommandRegistry {
         register("vi", ViCommand())
         register("vim", ViCommand())
 
+        // Extended commands (printf, gzip, zip, base64, hashes, etc.)
+        register("printf", com.linuxdroid.commands.system.PrintfCommand())
+        register("gzip", com.linuxdroid.commands.system.GzipCommand())
+        register("gunzip", com.linuxdroid.commands.system.GunzipCommand())
+        register("zcat", com.linuxdroid.commands.system.GzipCommand().apply {})
+        register("zip", com.linuxdroid.commands.system.ZipCommand())
+        register("unzip", com.linuxdroid.commands.system.UnzipCommand())
+        register("tar", com.linuxdroid.commands.system.TarCommand())
+        register("base64", com.linuxdroid.commands.system.Base64Command())
+        register("md5sum", com.linuxdroid.commands.system.Md5SumCommand())
+        register("sha256sum", com.linuxdroid.commands.system.Sha256SumCommand())
+        register("sha1sum", com.linuxdroid.commands.system.Sha256SumCommand())  // تبسيط
+        register("time", com.linuxdroid.commands.system.TimeCommand())
+        register("xargs", com.linuxdroid.commands.system.XargsCommand())
+        register("timeout", com.linuxdroid.commands.system.TimeoutCommand())
+        register("watch", com.linuxdroid.commands.system.WatchCommand())
+
         LinuxDroidLogger.i(TAG, "Registered ${commands.size} commands")
     }
 

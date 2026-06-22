@@ -38,4 +38,19 @@ data class ShellContext(
     fun writeErrln(s: String) = writeError(s + "\r\n")
     fun readAll(): String = stdin.bufferedReader(Charsets.UTF_8).use { it.readText() }
     fun readLines(): List<String> = stdin.bufferedReader(Charsets.UTF_8).use { it.readLines() }
+
+    /**
+     * SECURITY: يحلّ المسار بأمان داخل صندوق الرمل.
+     *
+     * @param path المسار النسبي أو المطلق
+     * @return الملف المُحلَّل أو null إذا كان ممنوعاً
+     */
+    fun resolveSafe(path: String): java.io.File? =
+        com.linuxdroid.security.SecurityUtils.resolveSafe(path, workingDirectory)
+
+    /**
+     * SECURITY: يحلّ المسار بأمان للكتابة (أكثر تقييداً).
+     */
+    fun resolveSafeForWrite(path: String): java.io.File? =
+        com.linuxdroid.security.SecurityUtils.resolveSafeForWrite(path, workingDirectory)
 }
