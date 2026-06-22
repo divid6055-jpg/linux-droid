@@ -24,9 +24,13 @@ class AnsiEscapeParser(private val buffer: TerminalBuffer) {
         OSC_ESC           // داخل OSC وانتظار BEL أو ST
     }
 
+    // SECURITY: حدود قصوى لمنع DoS عبر تسلسلات شاذّة (OOM)
+    private val MAX_PARAM_SIZE = 256
+    private val MAX_OSC_SIZE = 4096
+
     private var state = State.GROUND
     private val paramBuf = StringBuilder()
-    private var oscBuf = StringBuilder()
+    private val oscBuf = StringBuilder()
 
     /** معالجة سلسلة كاملة */
     fun feed(input: String) {
@@ -103,6 +107,12 @@ class AnsiEscapeParser(private val buffer: TerminalBuffer) {
 
     private fun handleCsi(c: Char) {
         if (c.isDigit() || c == ';' || c == '?' || c == '>' || c == '=' || c == '!' || c == ' ') {
+            // SECURITY: منع نموّ paramBuf بلا حدود (DoS)
+            if (paramBuf.length >= MAX_PARAM_SIZE) {
+                state = State.GROUND
+                paramBuf.clear()
+                return
+            }
             paramBuf.append(c)
             return
         }
@@ -312,7 +322,11 @@ class AnsiEscapeParser(private val buffer: TerminalBuffer) {
                 oscBuf.clear()
             }
             0x1B.toChar() -> state = State.OSC_ESC
-            else -> oscBuf.append(c)
+            else -> {
+                // SECURITY: منع نموّ oscBuf بلا حدود (DoS)
+                if (oscBuf.length < MAX_OSC_SIZE) oscBuf.append(c)
+                else { state = State.GROUND; oscBuf.clear() }
+            }
         }
         if (state == State.OSC_ESC) {
             if (c == '\\') {
@@ -321,7 +335,7 @@ class AnsiEscapeParser(private val buffer: TerminalBuffer) {
                 oscBuf.clear()
             } else if (c != 0x1B.toChar()) {
                 state = State.OSC
-                oscBuf.append(c)
+                if (oscBuf.length < MAX_OSC_SIZE) oscBuf.append(c)
             }
         }
     }
@@ -332,7 +346,9 @@ class AnsiEscapeParser(private val buffer: TerminalBuffer) {
         // OSC 4;n;rgb  → palette (تجاهل)
         // OSC 11;rgb   → background (تجاهل)
         // نتجاهل كل ذلك في هذه المرحلة
-        LinuxDroidLogger.d(TAG, "OSC: $s")
+        // SECURITY: نسجّل الطول فقط لمنع تضخيم الـ log
+        if (s.length <= 64) LinuxDroidLogger.d(TAG, "OSC: $s")
+        else LinuxDroidLogger.d(TAG, "OSC: (len=${s.length}, truncated)")
     }
 
     companion object { private const val TAG = "AnsiEscapeParser" }

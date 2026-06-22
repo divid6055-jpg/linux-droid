@@ -161,16 +161,20 @@ class Session(
 
 /**
  * مدير الجلسات — يحتفظ بجلسات متعددة (تبسيط: جلسة واحدة نشطة حالياً)
+ *
+ * SECURITY/THREAD-SAFETY: نستخدم ConcurrentHashMap و AtomicInteger
+ * لمنع التضارب عند إنشاء/إغلاق الجلسات من خيوط متعددة.
  */
 class SessionManager private constructor(private val context: Context) {
 
-    private val sessions = mutableMapOf<String, Session>()
-    private var sessionCounter = 0
+    private val sessions = java.util.concurrent.ConcurrentHashMap<String, Session>()
+    private val sessionCounter = java.util.concurrent.atomic.AtomicInteger(0)
 
     fun createSession(cols: Int, rows: Int): Session {
-        val id = "session-${++sessionCounter}"
+        val id = "session-${sessionCounter.incrementAndGet()}"
         val session = Session(id, context, cols, rows)
-        sessions[id] = session
+        // putIfAbsent لمنع التصادم النظري
+        sessions.putIfAbsent(id, session)
         return session
     }
 
@@ -178,8 +182,7 @@ class SessionManager private constructor(private val context: Context) {
     fun getActiveSessions(): List<Session> = sessions.values.filter { it.isRunning() }
 
     fun closeSession(id: String) {
-        sessions[id]?.stop()
-        sessions.remove(id)
+        sessions.remove(id)?.stop()
     }
 
     fun closeAll() {

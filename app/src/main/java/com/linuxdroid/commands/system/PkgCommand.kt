@@ -237,31 +237,52 @@ class PkgCommand : CommandExecutor {
     }
 
     private fun downloadAndInstall(meta: PackageInfo, ctx: ShellContext) {
-        // تنزيل الحزمة
-        val downloadUrl = URL("${REPO_BASE}/${meta.name}/${meta.version}/package.tar.gz")
+        // SECURITY: تحقق من اسم الحزمة قبل التنزيل
+        if (!com.linuxdroid.security.SecurityUtils.isValidPackageName(meta.name)) {
+            throw SecurityException("Invalid package name: ${meta.name}")
+        }
+        if (!com.linuxdroid.security.SecurityUtils.isValidVersion(meta.version)) {
+            throw SecurityException("Invalid version: ${meta.version}")
+        }
+        if (!com.linuxdroid.security.SecurityUtils.isValidSha256(meta.sha256)) {
+            throw SecurityException("Invalid SHA-256 format: ${meta.sha256}")
+        }
+
+        // SECURITY: تحقق من URL الحزمة قبل التنزيل
+        val downloadUrlStr = "${REPO_BASE}/${meta.name}/${meta.version}/package.tar.gz"
+        val urlCheck = com.linuxdroid.security.SecurityUtils.validateUrl(downloadUrlStr)
+        if (!urlCheck.ok) {
+            throw SecurityException("Invalid download URL: ${urlCheck.value}")
+        }
+
         val tmpFile = File(ctx.context.cacheDir, "${meta.name}-${meta.version}.tar.gz")
-        downloadUrl.openStream().use { input ->
-            tmpFile.outputStream().use { input.copyTo(it) }
-        }
+        try {
+            URL(urlCheck.value).openStream().use { input ->
+                tmpFile.outputStream().use { input.copyTo(it) }
+            }
 
-        // التحقق من SHA-256
-        val actualHash = sha256(tmpFile)
-        if (!actualHash.equals(meta.sha256, ignoreCase = true)) {
+            // التحقق من SHA-256
+            val actualHash = sha256(tmpFile)
+            if (!actualHash.equals(meta.sha256, ignoreCase = true)) {
+                throw SecurityException("SHA-256 mismatch: expected ${meta.sha256}, got $actualHash")
+            }
+
+            // SECURITY: تحقق من أن كل ملف في meta.files داخل صندوق الرمل
+            val safeRoot = Environment.rootDir.canonicalFile
+            for (relPath in meta.files) {
+                val target = File(Environment.rootDir, relPath).canonicalFile
+                val targetPath = target.absolutePath
+                val rootPath = safeRoot.absolutePath
+                if (!targetPath.startsWith("$rootPath/") && targetPath != rootPath) {
+                    throw SecurityException("Package tries to write outside sandbox: $relPath")
+                }
+                target.parentFile?.mkdirs()
+                // في النسخة الحقيقية نستخرج من tar.gz هنا
+            }
+        } finally {
+            // تنظيف الملف المؤقت دائماً
             tmpFile.delete()
-            throw SecurityException("SHA-256 mismatch: expected ${meta.sha256}, got $actualHash")
         }
-
-        // فك الضغط (تبسيط: ننسخ الملفات مباشرة)
-        // في النسخة الحقيقية نستخدم GZIPInputStream + TarInputStream
-        // هنا نكتوب بنسخ ملف واحد للتبسيط
-        for (relPath in meta.files) {
-            val target = File(Environment.rootDir, relPath)
-            target.parentFile?.mkdirs()
-            // نسخ من الحزمة (تبسيط: ننسخ tmpFile كتجربة)
-            // في النسخة الحقيقية نستخرج من tar.gz
-        }
-
-        tmpFile.delete()
     }
 
     private fun sha256(file: File): String {

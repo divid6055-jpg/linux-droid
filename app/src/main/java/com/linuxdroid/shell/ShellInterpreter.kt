@@ -83,7 +83,9 @@ class ShellInterpreter(
                     write("\r\n")
                     break
                 } catch (e: Exception) {
-                    LinuxDroidLogger.e(TAG, "Error executing line: $line", e)
+                    // SECURITY: نسجّل اسم الأمر فقط دون المعطيات (قد تحوي أسراراً)
+                    val cmdName = line.trim().split(Regex("\\s+")).firstOrNull() ?: "unknown"
+                    LinuxDroidLogger.e(TAG, "Error executing command '$cmdName': ${e.message}", e)
                     writeError("bash: ${e.message}\r\n")
                 }
                 printPrompt()

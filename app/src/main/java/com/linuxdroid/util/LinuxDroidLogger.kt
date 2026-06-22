@@ -42,20 +42,23 @@ object LinuxDroidLogger {
     fun e(tag: String, msg: String, t: Throwable? = null) = write('E', tag, msg, t)
 
     private fun write(level: Char, tag: String, msg: String, t: Throwable?) {
+        // SECURITY: فلترة الأسرار من الـ log لمنع تسرّبها
+        val safeMsg = com.linuxdroid.security.SecurityUtils.sanitizeLogMessage(msg)
+
         // logcat
         when (level) {
-            'V' -> Log.v(tag, msg)
-            'D' -> Log.d(tag, msg)
-            'I' -> Log.i(tag, msg)
-            'W' -> Log.w(tag, msg, t)
-            'E' -> Log.e(tag, msg, t)
+            'V' -> Log.v(tag, safeMsg)
+            'D' -> Log.d(tag, safeMsg)
+            'I' -> Log.i(tag, safeMsg)
+            'W' -> Log.w(tag, safeMsg, t)
+            'E' -> Log.e(tag, safeMsg, t)
         }
 
         // file (synchronized to avoid interleaving from multiple threads)
         synchronized(this) {
             try {
                 val ts = dateFormat.format(Date())
-                val line = "$ts $level/$tag: $msg\n" +
+                val line = "$ts $level/$tag: $safeMsg\n" +
                     (t?.let { "\n" + stackTraceToString(it) } ?: "")
                 logFile.appendText(line)
                 rotateIfNeeded()

@@ -65,18 +65,16 @@ class CurlCommand : CommandExecutor {
 
         if (urlStr == null) { ctx.writeErrln("curl: try 'curl --help' for more information"); return 1 }
 
-        // أمان: منع البروتوكولات الخطرة
-        val lowerUrl = urlStr.lowercase()
-        if (lowerUrl.startsWith("file://") || lowerUrl.startsWith("ftp://")) {
-            ctx.writeErrln("curl: protocol not supported or blocked for security")
+        // SECURITY: تحقق شامل من URL (منع SSRF)
+        val urlCheck = com.linuxdroid.security.SecurityUtils.validateUrl(urlStr)
+        if (!urlCheck.ok) {
+            ctx.writeErrln("curl: ${urlCheck.value}")
             return 1
         }
-        if (!lowerUrl.startsWith("http://") && !lowerUrl.startsWith("https://")) {
-            urlStr = "http://$urlStr"
-        }
+        val safeUrl = urlCheck.value
 
         return try {
-            val url = URL(urlStr)
+            val url = URL(safeUrl)
             val conn = url.openConnection() as HttpURLConnection
             if (conn is HttpsURLConnection) {
                 // استخدام SSLContext الافتراضي الموثوق
@@ -173,10 +171,16 @@ class WgetCommand : CommandExecutor {
         }
         if (urlStr == null) { ctx.writeErrln("wget: missing URL"); return 1 }
 
-        if (!urlStr.startsWith("http://") && !urlStr.startsWith("https://")) urlStr = "http://$urlStr"
+        // SECURITY: تحقق شامل من URL (منع SSRF)
+        val urlCheck = com.linuxdroid.security.SecurityUtils.validateUrl(urlStr)
+        if (!urlCheck.ok) {
+            ctx.writeErrln("wget: ${urlCheck.value}")
+            return 1
+        }
+        val safeUrl = urlCheck.value
 
         return try {
-            val url = URL(urlStr)
+            val url = URL(safeUrl)
             val conn = url.openConnection() as HttpURLConnection
             conn.connectTimeout = timeout
             conn.readTimeout = timeout
@@ -239,15 +243,24 @@ class PingCommand : CommandExecutor {
         var i = 0
         while (i < args.size) {
             when {
-                args[i] == "-c" && i + 1 < args.size -> count = args[++i].toIntOrNull() ?: 4
+                args[i] == "-c" && i + 1 < args.size -> {
+                    // SECURITY: منع count <= 0 ومنع تجاوز الحد
+                    count = args[++i].toIntOrNull()?.coerceIn(1, 1000) ?: 4
+                }
                 !args[i].startsWith("-") -> target = args[i]
             }
             i++
         }
         if (target == null) { ctx.writeErrln("ping: usage: ping [-c count] host"); return 1 }
 
+        // SECURITY: تحقق من الهدف لمنع ping لعناوين داخلية حساسة
         return try {
             val addr = InetAddress.getByName(target)
+            if (addr.isLoopbackAddress || addr.isSiteLocalAddress || addr.isLinkLocalAddress ||
+                addr.isAnyLocalAddress || addr.isMulticastAddress) {
+                ctx.writeErrln("ping: cannot ping internal/multicast addresses for security reasons")
+                return 1
+            }
             ctx.writeln("PING $target (${addr.hostAddress}) 56(84) bytes of data.")
             var received = 0
             for (i in 1..count) {
@@ -264,7 +277,8 @@ class PingCommand : CommandExecutor {
             }
             ctx.writeln("")
             ctx.writeln("--- $target ping statistics ---")
-            ctx.writeln("$count packets transmitted, $received received, ${((count - received) * 100 / count)}% packet loss")
+            val lossPct = if (count > 0) (count - received) * 100 / count else 0
+            ctx.writeln("$count packets transmitted, $received received, $lossPct% packet loss")
             if (received > 0) 0 else 1
         } catch (e: UnknownHostException) {
             ctx.writeErrln("ping: ${e.message}")
