@@ -1,0 +1,38 @@
+{
+  "version": "1.0.0",
+  "generated": "2026-06-22T00:00:00Z",
+  "packages": [
+    {
+      "name": "hello-world",
+      "version": "1.0.0",
+      "description": "Sample package that prints hello world",
+      "size": 1024,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "files": ["bin/hello"]
+    },
+    {
+      "name": "bash-completion",
+      "version": "1.0.0",
+      "description": "Bash completion scripts for common commands",
+      "size": 4096,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "files": ["share/bash-completion/completions/ls", "share/bash-completion/completions/grep"]
+    },
+    {
+      "name": "fortune",
+      "version": "1.0.0",
+      "description": "Random quotes and fortunes",
+      "size": 8192,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "files": ["bin/fortune", "share/fortunes/quotes.txt"]
+    },
+    {
+      "name": "cowsay",
+      "version": "1.0.0",
+      "description": "Configurable speaking cow",
+      "size": 2048,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "files": ["bin/cowsay"]
+    }
+  ]
+}
