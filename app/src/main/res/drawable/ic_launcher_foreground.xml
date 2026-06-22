@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- خلفية دائرية -->
+    <path
+        android:fillColor="#0C0C0C"
+        android:pathData="M54,54m-50,0a50,50 0,1 1,100 0a50,50 0,1 1,-100 0" />
+    <!-- حرف > (prompt) -->
+    <path
+        android:fillColor="#4FC3F7"
+        android:pathData="M28,38L46,54L28,70L34,76L58,54L34,32Z" />
+    <!-- شرطة سفلية (cursor) -->
+    <path
+        android:fillColor="#4FC3F7"
+        android:pathData="M62,68L82,68L82,76L62,76Z" />
+</vector>
