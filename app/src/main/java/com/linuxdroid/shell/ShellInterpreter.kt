@@ -58,6 +58,12 @@ class ShellInterpreter(
         sessionId = sessionId
     )
 
+    /** مدير التاريخ (يدعم التنقل بالأسهم والبحث) */
+    private val historyManager = HistoryManager(java.io.File(Environment.homeDir, ".bash_history"))
+
+    /** مُكمل Tab */
+    private val tabCompleter = TabCompleter(shellContext.environment, shellContext.workingDirectory)
+
     private val history = mutableListOf<String>()
     private val aliases = mutableMapOf<String, String>()
 
@@ -77,6 +83,7 @@ class ShellInterpreter(
                     continue
                 }
                 history.add(line)
+                historyManager.add(line) // SECURITY: تم فلترة الأوامر الحساسة
                 try {
                     executeLine(line)
                 } catch (e: ExitException) {
@@ -307,17 +314,28 @@ class ShellInterpreter(
         val redirectInfo = parseRedirections(line)
         val cmdLine = redirectInfo.commandLine
 
-        // 2. توسيع متغيرات البيئة والـ tilde والـ globs
+        // 2. توسيع متغيرات البيئة والـ tilde
         val expanded = expandLine(cmdLine, ctx)
 
-        // 3. تقسيم token
-        val tokens = tokenize(expanded)
-        if (tokens.isEmpty()) return 0
+        // 3. تقسيم token (مع احترام الاقتباس)
+        val rawTokens = tokenize(expanded)
+        if (rawTokens.isEmpty()) return 0
+
+        // 4. توسيع glob (البدائل * ? [abc]) على الـ tokens غير المقتبسة
+        val tokens = mutableListOf<String>()
+        for (token in rawTokens) {
+            val globbed = expandGlob(token, ctx)
+            if (globbed.isEmpty()) {
+                tokens.add(token)  // لا توجد مطابقات — نحتفظ بالأصل
+            } else {
+                tokens.addAll(globbed)
+            }
+        }
 
         val cmdName = tokens[0]
         val args = tokens.drop(1).toMutableList()
 
-        // 4. توسيع alias
+        // 5. توسيع alias
         aliases[cmdName]?.let { alias ->
             val aliasTokens = tokenize(expandLine(alias, ctx))
             // استبدال: alias $args
@@ -326,6 +344,63 @@ class ShellInterpreter(
         }
 
         return executeCommand(cmdName, args, ctx, redirectInfo)
+    }
+
+    /** يوسّع نمط glob (* ? [abc]) إلى قائمة ملفات مطابقة */
+    private fun expandGlob(token: String, ctx: ShellContext): List<String> {
+        // إذا كان الـ token يحوي علامات اقتباس، لا نوسّع
+        if (token.contains("'") || token.contains("\"")) return emptyList()
+        // إذا كان لا يحوي أحرف glob، لا نوسّع
+        if (!token.containsAnyOf("*?[")) return emptyList()
+
+        // حلّ المسار
+        val file = if (token.startsWith("/")) java.io.File(token)
+                   else java.io.File(ctx.workingDirectory, token)
+        val parent = file.parentFile ?: java.io.File(ctx.workingDirectory)
+        val pattern = file.name
+
+        if (!parent.exists() || !parent.isDirectory) return emptyList()
+
+        // بناء regex من glob
+        val regex = buildRegexFromGlob(pattern)
+        val matches = parent.listFiles()
+            ?.filter { regex.matches(it.name) }
+            ?.sortedBy { it.name }
+            ?: emptyList()
+
+        return matches.map {
+            val path = it.absolutePath
+            // إعادة لـ المسار النسبي إذا كان الأصل نسبياً
+            if (!token.startsWith("/")) {
+                val rel = if (token.startsWith("~")) "~" + path.removePrefix(ctx.environment["HOME"] ?: "")
+                          else path.removePrefix(ctx.workingDirectory + "/")
+                rel
+            } else path
+        }
+    }
+
+    private fun String.containsAnyOf(chars: String): Boolean = chars.any { it in this }
+
+    private fun buildRegexFromGlob(pattern: String): Regex {
+        val sb = StringBuilder()
+        var i = 0
+        var inClass = false
+        while (i < pattern.length) {
+            val c = pattern[i]
+            when {
+                inClass -> {
+                    sb.append(c)
+                    if (c == ']') inClass = false
+                }
+                c == '*' -> sb.append(".*")
+                c == '?' -> sb.append('.')
+                c == '[' -> { sb.append('['); inClass = true }
+                c in ".+(){}^\$|" -> { sb.append('\\').append(c) }
+                else -> sb.append(c)
+            }
+            i++
+        }
+        return Regex(sb.toString())
     }
 
     private data class RedirectInfo(
