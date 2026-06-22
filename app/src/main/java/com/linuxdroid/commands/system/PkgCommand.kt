@@ -329,11 +329,11 @@ class PkgCommand : CommandExecutor {
 
     data class PackageInfo(
         val name: String,
-        val version: String,
+        var version: String,
         val description: String,
         val size: Long,
         val sha256: String,
-        val files: List<String>
+        var files: List<String>
     )
 
     companion object {

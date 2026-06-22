@@ -210,13 +210,25 @@ object SecurityUtils {
             Pattern.compile("(?i)\\-H\\s+\"[^\"]*authorization[^\"]*\"")
         )
         for (p in patterns) {
-            result = p.matcher(result).replaceAll { mr ->
-                val text = mr.group()
+            // SECURITY: نستخدم appendReplacement/appendTail لدعم API 24+
+            // (replaceAll(Function) يتطلب API 34)
+            val m = p.matcher(result)
+            val sb = StringBuffer()
+            while (m.find()) {
+                val text = m.group()
                 val eq = text.indexOf('=')
                 val colon = text.indexOf(':')
-                val sep = if (eq > 0) '=' else if (colon > 0) ':' else return@replaceAll text
-                text.substring(0, sep + 1) + "[REDACTED]"
+                val replacement = if (eq > 0) {
+                    text.substring(0, eq + 1) + "[REDACTED]"
+                } else if (colon > 0) {
+                    text.substring(0, colon + 1) + "[REDACTED]"
+                } else {
+                    "[REDACTED]"
+                }
+                m.appendReplacement(sb, java.util.regex.Matcher.quoteReplacement(replacement))
             }
+            m.appendTail(sb)
+            result = sb.toString()
         }
         return result
     }

@@ -197,7 +197,7 @@ class WgetCommand : CommandExecutor {
             val file = if (fileName.startsWith("/")) File(fileName) else File(ctx.workingDirectory, fileName)
             file.parentFile?.mkdirs()
 
-            if (verbose) ctx.writeln("--${SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date())}--  $urlStr")
+            if (verbose) ctx.writeln("--${sharedDateFormat.format(java.util.Date())}--  $urlStr")
             if (verbose) ctx.writeln("Connecting... connected.")
             if (verbose) ctx.writeln("HTTP request sent, awaiting response... $code ${conn.responseMessage}")
             if (verbose) ctx.writeln("Length: ${conn.contentLength} (${conn.contentLength / 1024}K) [${conn.contentType}]")
@@ -224,7 +224,7 @@ class WgetCommand : CommandExecutor {
                     }
                 }
             }
-            if (verbose) ctx.writeln("\r\n${SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date())} (${read} bytes) - '$fileName' saved")
+            if (verbose) ctx.writeln("\r\n${sharedDateFormat.format(java.util.Date())} (${read} bytes) - '$fileName' saved")
             0
         } catch (e: Exception) {
             ctx.writeErrln("wget: ${e.message}")
@@ -329,7 +329,14 @@ class IfconfigCommand : CommandExecutor {
         return 0
     }
     private val java.net.NetworkInterface.interfaceFlags: String
-        get() = buildString { if (isUp) append("UP "); if (isLoopback) append("LOOPBACK "); if (isPointToPoint) append("POINTOPOINT "); if (supportsMulticast) append("MULTICAST ") }
+        get() {
+            val sb = StringBuilder()
+            if (isUp) sb.append("UP ")
+            if (isLoopback) sb.append("LOOPBACK ")
+            if (isPointToPoint) sb.append("POINTOPOINT ")
+            if (supportsMulticast) sb.append("MULTICAST ")
+            return sb.toString().trimEnd()
+        }
 }
 
 /** ip — أداة شبكة حديثة (تبسيط) */
@@ -385,5 +392,5 @@ class ScpStubCommand : CommandExecutor {
     }
 }
 
-// لاستيراد SimpleDateFormat
-private val SimpleDateFormat = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+// قيمة مشتركة لتنسيق التاريخ (لتجنّب إنشاء مثيل في كل مرة)
+private val sharedDateFormat = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
